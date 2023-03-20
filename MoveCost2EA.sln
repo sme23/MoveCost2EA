@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoveCost2EA", "MoveCost2EA\MoveCost2EA.csproj", "{47C83A56-04A2-4C1C-ABF3-515B64199846}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
