@@ -1,7 +1,9 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoveCost2EA", "MoveCost2EA\MoveCost2EA.csproj", "{47C83A56-04A2-4C1C-ABF3-515B64199846}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoveCost2EA", "MoveCost2EA.csproj", "{23DD0263-A4D2-4A7A-A593-C19B08CC4493}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,9 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{47C83A56-04A2-4C1C-ABF3-515B64199846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23DD0263-A4D2-4A7A-A593-C19B08CC4493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23DD0263-A4D2-4A7A-A593-C19B08CC4493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23DD0263-A4D2-4A7A-A593-C19B08CC4493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23DD0263-A4D2-4A7A-A593-C19B08CC4493}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AE4912B-C2BA-420F-9960-C5414A08A3C6}
 	EndGlobalSection
 EndGlobal
