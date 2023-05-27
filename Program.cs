@@ -67,12 +67,15 @@ namespace MoveCost2EA
 
 
             //before we do this go through every line once and delete comments from the end where applicable
+            
             for (int i = 0; i < ilines.Count; i++)
             {
+                ilines[i] = (string)ilines[i] + "\n";
                 string line = (string)ilines[i];
-                for (int j = 0; j < line.Length; j++)
+                if (line.Length < 3) break;
+                for (int j = 0; j < line.Length-3; j++)
                 {
-                    if (line.Substring(j,j+2).Equals("//"))
+                    if (line.Substring(j,2).Equals("//"))
                     {
                         ilines[i] = line.Substring(0,j);
                         break;
@@ -80,6 +83,8 @@ namespace MoveCost2EA
                 }
             }
 
+            
+            
 
 
             foreach (string line in ilines) {
@@ -95,9 +100,11 @@ namespace MoveCost2EA
                     //is it a definition?
                     if (curLine.Substring(0, curLine.IndexOfAny(whitespace)).Equals("#define"))
                     {
-                        curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                        string defName = curLine.Substring(0, curLine.IndexOfAny(whitespace));
-                        curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
+                        curLine = curLine.TrimStart();
+                        int next = curLine.IndexOfAny(whitespace);
+                        if (next == -1) next = 0;
+                        string defName = curLine.Substring(0, next);
+                        curLine = curLine.Substring(next).TrimStart();
                         string defVal = curLine.TrimEnd();
 
                         defs.addDef(defName, defVal);
@@ -105,7 +112,7 @@ namespace MoveCost2EA
                     else //it's the start of a new group
                     {
                         curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                        string groupName = curLine.Substring(0, curLine.IndexOfAny(whitespace));
+                        string groupName = curLine.Substring(0, curLine.IndexOf('{')).Trim() ;
 
                         if (tableExists(groupName,tables))
                         {
@@ -116,8 +123,10 @@ namespace MoveCost2EA
                         table = new MoveCostTable();
                         table.setName(groupName);
 
-                        curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                        if (curLine.Substring(0, curLine.IndexOfAny(whitespace)).Equals("imports"))
+                        int next = curLine.IndexOfAny(whitespace);
+                        if (next == -1) next = 0;
+                        curLine = curLine.Substring(next).TrimStart();
+                        if (curLine.Substring(0, next).Equals("imports"))
                         {
                             curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
                             string importName = curLine.Substring(0, curLine.IndexOfAny(whitespace));
@@ -127,6 +136,8 @@ namespace MoveCost2EA
                                 return -1;
                             }
                             table.copyCosts(getTableByName(importName, tables));
+                            next = curLine.IndexOfAny(whitespace);
+                            if (next == -1) next = 7;
                             curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
                         }  
                       
@@ -184,11 +195,17 @@ namespace MoveCost2EA
 
 
                     //Parse operands from line string first
-                    string indexOperand = curLine.Substring(0, curLine.IndexOfAny(whitespace));
-                    curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                    string op = curLine.Substring(0, curLine.IndexOfAny(whitespace));
-                    curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                    string valueOperand = curLine.Substring(0, curLine.IndexOfAny(whitespace));
+                    int next = curLine.IndexOfAny(whitespace);
+                    if (next == -1) next = 0;
+                    string indexOperand = curLine.Substring(0, next);
+                    curLine = curLine.Substring(next).TrimStart();
+                    next = curLine.IndexOfAny(whitespace);
+                    if (next == -1) next = 0;
+                    string op = curLine.Substring(0, next);
+                    curLine = curLine.Substring(next).TrimStart();
+                    next = curLine.IndexOfAny(whitespace);
+                    if (next == -1) next = 0;
+                    string valueOperand = curLine.Substring(0, next);
 
                     //verify validity of this; check indexOperand format, check operand is valid, check value is either an integer or the referenced group exists, if 2 arrays check for same length
 
@@ -206,7 +223,9 @@ namespace MoveCost2EA
                     if (valueOperand.IndexOf('[') != 0)
                     {
                         //This operand begins with the name of a movegroup, then has an array to be parsed
-                        string groupName = valueOperand.Substring(0, valueOperand.IndexOf('[') - 1);
+                        int n = valueOperand.IndexOf('[') - 1;
+                        if (n == -2) n = 0;
+                        string groupName = valueOperand.Substring(0, n);
                         if (!tableExists(groupName,tables))
                         {
                             Console.Out.WriteLine("ERROR: Nonexistent movegroup " + groupName + ".");
@@ -335,7 +354,7 @@ namespace MoveCost2EA
             ArrayList lines = new ArrayList();
             foreach (string line in System.IO.File.ReadLines(file))
             {
-                if (line.TrimStart().Substring(0,7).Equals("#include")) {
+                if ((line.Length > 7) && line.TrimStart().Substring(0,7).Equals("#include")) {
                     int lastIndex = file.LastIndexOf('/');
                     if (lastIndex == -1) lastIndex = file.LastIndexOf('\\');
                     if (lastIndex == -1) lastIndex = 0;
