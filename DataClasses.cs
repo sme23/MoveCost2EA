@@ -33,7 +33,7 @@ namespace MoveCost2EA
     }
     public class MoveCostTable
     {
-        private ArrayList costs = new ArrayList();
+        private int[] costs = new int[256];
         private string name;
 
         public void setName(string s)
@@ -52,7 +52,7 @@ namespace MoveCost2EA
         {
             return (int)costs[index];
         }
-        public ArrayList getTable()
+        public int[] getTable()
         {
             return costs;
         }
@@ -61,7 +61,7 @@ namespace MoveCost2EA
             int i = 0;
             foreach (Object cost in initTable.getTable())
             {
-                costs[i] = cost;
+                costs[i] = (int)cost;
                 i++;
             }
         }

@@ -41,7 +41,7 @@ namespace MoveCost2EA
                 Console.Out.WriteLine(helpString);
                 return 0;
             }
-
+            Console.Out.WriteLine("test");
             string ifile = args[0];
             string ofile;
             if (args.Length == 2) { ofile = args[1]; } else { 
@@ -61,7 +61,7 @@ namespace MoveCost2EA
             //set up some objects first
             DefinitionDict defs = new DefinitionDict(); //hashtable of definitions and their values
             List<MoveCostTable> tables = new List<MoveCostTable>(); //list of MoveCostTable objects
-            MoveCostTable table = new MoveCostTable(); ; //current move cost table
+            MoveCostTable table = new MoveCostTable(); //current move cost table
             bool inTable = false; //whether or not we're currently parsing in a table
             char[] whitespace = {' ', '\t', '\n', '\r'};
 
@@ -70,11 +70,12 @@ namespace MoveCost2EA
             
             for (int i = 0; i < ilines.Count; i++)
             {
-                ilines[i] = (string)ilines[i] + "\n";
+                //ilines[i] = (string)ilines[i] + "\n";
                 string line = (string)ilines[i];
-                if (line.Length < 3) break;
-                for (int j = 0; j < line.Length-3; j++)
+                if (line.Length < 3) continue;
+                for (int j = 0; j < line.Length-2; j++)
                 {
+                    //Console.Out.WriteLine("Testing from " + j + " to " + (j+1) + ": " + line.Substring(j,2));
                     if (line.Substring(j,2).Equals("//"))
                     {
                         ilines[i] = line.Substring(0,j);
@@ -102,8 +103,10 @@ namespace MoveCost2EA
                     {
                         curLine = curLine.TrimStart();
                         int next = curLine.IndexOfAny(whitespace);
-                        if (next == -1) next = 0;
-                        string defName = curLine.Substring(0, next);
+                        if (next == -1) next = 1;   //TODO: throw an error
+                        curLine = curLine.Substring(next).TrimStart();
+                        string defName = curLine.Substring(0,curLine.IndexOfAny(whitespace));
+                        next = curLine.IndexOfAny(whitespace);
                         curLine = curLine.Substring(next).TrimStart();
                         string defVal = curLine.TrimEnd();
 
@@ -111,8 +114,8 @@ namespace MoveCost2EA
                     }
                     else //it's the start of a new group
                     {
-                        curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
-                        string groupName = curLine.Substring(0, curLine.IndexOf('{')).Trim() ;
+                        curLine = curLine.TrimStart();
+                        string groupName = curLine.Substring(0, curLine.IndexOfAny(whitespace)).Trim() ;
 
                         if (tableExists(groupName,tables))
                         {
@@ -124,9 +127,9 @@ namespace MoveCost2EA
                         table.setName(groupName);
 
                         int next = curLine.IndexOfAny(whitespace);
-                        if (next == -1) next = 0;
+                        if (next == -1) next = 1;
                         curLine = curLine.Substring(next).TrimStart();
-                        if (curLine.Substring(0, next).Equals("imports"))
+                        if (curLine.Length > 7 && curLine.Substring(0, 7).Equals("imports"))
                         {
                             curLine = curLine.Substring(curLine.IndexOfAny(whitespace)).TrimStart();
                             string importName = curLine.Substring(0, curLine.IndexOfAny(whitespace));
@@ -196,16 +199,18 @@ namespace MoveCost2EA
 
                     //Parse operands from line string first
                     int next = curLine.IndexOfAny(whitespace);
-                    if (next == -1) next = 0;
+                    if (next == -1) next = 1;
                     string indexOperand = curLine.Substring(0, next);
                     curLine = curLine.Substring(next).TrimStart();
                     next = curLine.IndexOfAny(whitespace);
-                    if (next == -1) next = 0;
+                    if (next == -1) next = 1;
                     string op = curLine.Substring(0, next);
                     curLine = curLine.Substring(next).TrimStart();
                     next = curLine.IndexOfAny(whitespace);
-                    if (next == -1) next = 0;
+                    if (next == -1) next = curLine.Length;
                     string valueOperand = curLine.Substring(0, next);
+
+                   
 
                     //verify validity of this; check indexOperand format, check operand is valid, check value is either an integer or the referenced group exists, if 2 arrays check for same length
 
@@ -220,10 +225,10 @@ namespace MoveCost2EA
                     //the start of this is either the name of a movegroup, something to be parsed as a definition, or an integer
                     //let's assume that if the line contains brackets that it's a reference to another movegroup
 
-                    if (valueOperand.IndexOf('[') != 0)
+                    if (valueOperand.IndexOf('[') != -1)
                     {
                         //This operand begins with the name of a movegroup, then has an array to be parsed
-                        int n = valueOperand.IndexOf('[') - 1;
+                        int n = valueOperand.IndexOf('[');
                         if (n == -2) n = 0;
                         string groupName = valueOperand.Substring(0, n);
                         if (!tableExists(groupName,tables))
@@ -231,7 +236,7 @@ namespace MoveCost2EA
                             Console.Out.WriteLine("ERROR: Nonexistent movegroup " + groupName + ".");
                             return -1;
                         }
-                        valueOperand = valueOperand.Substring(valueOperand.IndexOfAny(whitespace) + 1);
+                        valueOperand = valueOperand.Substring(valueOperand.IndexOf('['));
 
                         ArrayList intermediateArray = new ArrayList();
                         intermediateArray.AddRange(parseArgument(valueOperand, defs));
@@ -261,7 +266,7 @@ namespace MoveCost2EA
 
 
                     //verify operand is valid, then perform an operation based on what it is
-                    switch (indexOperand)
+                    switch (op)
                     {
                         case "+":
                             for (int i = 0; i < inputArray.Count; i++) {
@@ -329,7 +334,7 @@ namespace MoveCost2EA
             foreach (MoveCostTable curTable in tables)
             {
                 string contentLine = "BYTE ";
-                installerText.Add(curTable.getName());
+                installerText.Add(curTable.getName() + ":");
                 for (int i = 0; i < 256; i++)
                 {
                     contentLine += curTable.getCost(i) + " ";
@@ -338,11 +343,9 @@ namespace MoveCost2EA
                 installerText.Add("\n");
             }
 
-
             if (File.Exists(ofile)) File.Delete(ofile);
             File.OpenWrite(ofile).Close();
-
-            File.WriteAllLines(ofile, (string[])installerText.ToArray());
+            File.WriteAllLines(ofile, (String[])installerText.ToArray(typeof(string)));
 
             Console.Out.WriteLine("Finished.");
 
@@ -357,7 +360,7 @@ namespace MoveCost2EA
                 if ((line.Length > 7) && line.TrimStart().Substring(0,7).Equals("#include")) {
                     int lastIndex = file.LastIndexOf('/');
                     if (lastIndex == -1) lastIndex = file.LastIndexOf('\\');
-                    if (lastIndex == -1) lastIndex = 0;
+                    if (lastIndex == -1) lastIndex = 1;
                     string appendedPath = line.Trim().Substring(7).Trim();
                     appendedPath = appendedPath.Substring(1, appendedPath.Length - 1);
                     string newFile = file.Substring(0, lastIndex) + appendedPath;
@@ -396,7 +399,7 @@ namespace MoveCost2EA
 
             ArrayList retList = new ArrayList();
 
-            if (!input.Substring(0,1).Equals("["))
+            if (input.IndexOf("[") == -1)
             {
                 //not an array, so parse for definition value if needed and return result
                 retList.Add(int.Parse((string)getDefinitionValue(input, defs)));
@@ -421,7 +424,7 @@ namespace MoveCost2EA
                 }
 
                 //is the next operator - or ,
-                if (input.IndexOf('-') > input.IndexOf('-'))
+                if (input.IndexOf('-') != -1)
                 {
                     //it's -, so we want all values from the first of the next values to the second of the next values
                     int startValue = int.Parse((string)getDefinitionValue(input.Substring(0, input.IndexOf('-')),defs));
