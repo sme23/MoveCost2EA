@@ -98,8 +98,10 @@ namespace MoveCost2EA
 
                 if (!inTable)
                 {
-                    //is it a definition?
-                    if (curLine.Substring(0, curLine.IndexOfAny(whitespace)).Equals("#define"))
+                    if (curLine.Substring(0, curLine.IndexOfAny(whitespace)).Equals("#include")) continue;
+
+                        //is it a definition?
+                        if (curLine.Substring(0, curLine.IndexOfAny(whitespace)).Equals("#define"))
                     {
                         curLine = curLine.TrimStart();
                         int next = curLine.IndexOfAny(whitespace);
@@ -357,12 +359,12 @@ namespace MoveCost2EA
             ArrayList lines = new ArrayList();
             foreach (string line in System.IO.File.ReadLines(file))
             {
-                if ((line.Length > 7) && line.TrimStart().Substring(0,7).Equals("#include")) {
-                    int lastIndex = file.LastIndexOf('/');
-                    if (lastIndex == -1) lastIndex = file.LastIndexOf('\\');
-                    if (lastIndex == -1) lastIndex = 1;
-                    string appendedPath = line.Trim().Substring(7).Trim();
-                    appendedPath = appendedPath.Substring(1, appendedPath.Length - 1);
+                if ((line.Length > 8) && line.TrimStart().Substring(0,8).Equals("#include")) {
+                    int lastIndex = file.LastIndexOf('/') + 1;
+                    if (lastIndex == 0) lastIndex = file.LastIndexOf('\\') + 1;
+                    if (lastIndex == 0) lastIndex = 1;
+                    string appendedPath = line.Trim().Substring(8).Trim();
+                    appendedPath = appendedPath.Substring(0, appendedPath.Length).Trim();
                     string newFile = file.Substring(0, lastIndex) + appendedPath;
                     lines.AddRange(getLines(newFile));
                 }
