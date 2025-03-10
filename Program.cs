@@ -41,7 +41,7 @@ namespace MoveCost2EA
                 Console.Out.WriteLine(helpString);
                 return 0;
             }
-            Console.Out.WriteLine("test");
+            //Console.Out.WriteLine("test");
             string ifile = args[0];
             string ofile;
             if (args.Length == 2) { ofile = args[1]; } else { 
@@ -258,10 +258,20 @@ namespace MoveCost2EA
                         valueArray = parseArgument(valueOperand,defs);
                     }
 
+                    //if only 1 value, repeat to # of inputs in size
+                    if (valueArray.Count == 1 && inputArray.Count != 1) 
+                    {
+                        int tmp = (int)valueArray[0];
+                        for (int i = 0; i < inputArray.Count - 1; i++)
+                        {
+                            valueArray.Add(tmp);
+                        }
+                    }
+
                     //verify that both arrays are the same length
                     if (inputArray.Count != valueArray.Count)
                     {
-                        Console.Out.WriteLine("ERROR: Incongruent input and value array sizes.");
+                        Console.Out.WriteLine("ERROR: Incongruent input and value array sizes. " + inputArray.Count + " input(s) and " + valueArray.Count + " output(s).");
                         return -1;
                     }
 
@@ -365,7 +375,7 @@ namespace MoveCost2EA
                     if (lastIndex == 0) lastIndex = 1;
                     string appendedPath = line.Trim().Substring(8).Trim();
                     appendedPath = appendedPath.Substring(0, appendedPath.Length).Trim();
-                    string newFile = file.Substring(0, lastIndex) + appendedPath;
+                    string newFile = file.Substring(0, lastIndex - 1) + appendedPath;
                     lines.AddRange(getLines(newFile));
                 }
                 else
